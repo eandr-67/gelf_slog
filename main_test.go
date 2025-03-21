@@ -1,4 +1,4 @@
-package sloggraylog
+package gelf_slog
 
 import (
 	"testing"
