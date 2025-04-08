@@ -8,7 +8,6 @@ import (
 )
 
 var SourceKey = "source"
-var ErrorKeys = []string{"error", "err"}
 
 type Converter func(
 	addSource bool, replaceAttr func(groups []string, a slog.Attr) slog.Attr, loggerAttr []slog.Attr, groups []string,
@@ -30,15 +29,6 @@ func DefaultConverter(
 	// handler formatter
 	extra = AttrsToMap(attrs...)
 
-	for _, errorKey := range ErrorKeys {
-		if v, ok := extra[errorKey]; ok {
-			if err, ok := v.(error); ok {
-				extra[errorKey] = slogcommon.FormatError(err)
-				break
-			}
-		}
-	}
-
 	return extra
 }
 
@@ -51,7 +41,9 @@ func AttrsToMap(attrs ...slog.Attr) map[string]any {
 		if v.Kind() == slog.KindGroup {
 			output[k] = AttrsToMap(v.Group()...)
 		} else if v.Kind() == slog.KindAny {
-			if tmp, err := json.Marshal(v.Any()); err != nil {
+			if tmp, ok := v.Any().(error); ok {
+				output[k] = tmp.Error()
+			} else if tmp, err := json.Marshal(v.Any()); err != nil {
 				output[k] = "!BAD_SERIALIZE! " + err.Error()
 			} else {
 				output[k] = string(tmp)
