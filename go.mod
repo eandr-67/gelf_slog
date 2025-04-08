@@ -13,5 +13,5 @@ require (
 require (
 	github.com/samber/lo v1.49.1 // indirect
 	github.com/stretchr/testify v1.10.0 // indirect
-	golang.org/x/text v0.23.0 // indirect
+	golang.org/x/text v0.24.0 // indirect
 )
